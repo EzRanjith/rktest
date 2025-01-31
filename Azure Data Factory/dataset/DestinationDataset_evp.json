@@ -1,0 +1,16 @@
+{
+	"name": "DestinationDataset_evp",
+	"properties": {
+		"annotations": [],
+		"type": "SqlPoolTable",
+		"schema": [],
+		"typeProperties": {
+			"table": "dbo.customer2019"
+		},
+		"sqlPool": {
+			"referenceName": "DedicatePool",
+			"type": "SqlPoolReference"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

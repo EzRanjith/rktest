@@ -1,0 +1,17 @@
+{
+	"name": "DestinationDataset_5ue",
+	"properties": {
+		"annotations": [],
+		"type": "SqlPoolTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Excustomer"
+		},
+		"sqlPool": {
+			"referenceName": "DedicatePool",
+			"type": "SqlPoolReference"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}
