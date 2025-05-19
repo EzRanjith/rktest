@@ -1,8 +1,52 @@
-{
-	"folders": [
-		{
-			"path": "PowerBI-Developer-Samples-master/Python"
-		}
-	],
-	"settings": {}
-}
+from flask import Flask, jsonify
+from flask_cors import CORS
+import msal
+import requests
+
+app = Flask(__name__)
+CORS(app)
+
+# Replace with your values from Azure AD app registration
+TENANT_ID = 'e5f0cfce-d804-44f9-8ef7-d7ce7a67e625'
+CLIENT_ID = '0d72d657-50de-473d-97a1-e843c3719810'
+CLIENT_SECRET = '61B8Q~5vSQ_.qsiypLnl6YuhNBB7e4e.guYnWav8'
+WORKSPACE_ID = '68873687-ccc9-4cdf-8432-44082c299565'
+REPORT_ID = '56182005-f5be-48c7-a2d0-3c5ff028e70d'
+
+AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
+SCOPE = ["https://analysis.windows.net/powerbi/api/.default"]
+POWER_BI_API = "https://api.powerbi.com/v1.0/myorg"
+
+@app.route("/get-embed-config")
+def get_embed_config():
+    app = msal.ConfidentialClientApplication(
+        CLIENT_ID, authority=AUTHORITY,
+        client_credential=CLIENT_SECRET
+    )
+    token_response = app.acquire_token_for_client(scopes=SCOPE)
+    access_token = token_response["access_token"]
+
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+
+    embed_token_url = f"{POWER_BI_API}/groups/{WORKSPACE_ID}/reports/{REPORT_ID}/GenerateToken"
+    embed_token_body = {
+        "accessLevel": "view"
+    }
+
+    token_resp = requests.post(embed_token_url, headers=headers, json=embed_token_body)
+    embed_token = token_resp.json()["token"]
+
+    report_info_url = f"{POWER_BI_API}/groups/{WORKSPACE_ID}/reports/{REPORT_ID}"
+    report_info = requests.get(report_info_url, headers=headers).json()
+
+    return jsonify({
+        "id": REPORT_ID,
+        "embedUrl": report_info["embedUrl"],
+        "accessToken": embed_token
+    })
+
+if __name__ == '__main__':
+    app.run(debug=True)
